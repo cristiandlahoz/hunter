@@ -39,6 +39,7 @@ struct SidebarView: View {
                         )
                     }
                     .buttonStyle(.plain)
+                    .keyboardShortcut(KeyEquivalent(destination.shortcut), modifiers: .command)
                     .accessibilityLabel(destination.rawValue)
                 }
             }

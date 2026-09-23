@@ -32,7 +32,8 @@ The app runs quietly in the macOS menu bar and opens into a desktop window for i
 - Current charge, power source, estimated time remaining, measured battery watts, health, cycles, and temperature.
 - Current unplugged-session start, duration, percentage drop, and average drain rate.
 - Charge history reconstructed from macOS power logs and continued with local samples.
-- Relative application-impact ranking based on CPU and memory activity; macOS does not expose trustworthy historical per-app watts.
+- Relative application-impact ranking and session attribution based on sampled macOS Energy Impact; macOS does not expose trustworthy historical per-app watt-hours.
+- Explicit attribution coverage, observed share, estimated charge equivalent, active time, average impact, and peak impact for each sampled application.
 - Menu-bar status and desktop dashboard.
 - No cloud account, analytics, Electron runtime, or mandatory administrator privileges.
 

@@ -7,15 +7,17 @@ WattHound is deliberately not another circular battery gauge. It joins the curre
 ## What works
 
 - Current unplugged-session start, duration, charge used, and average drain rate
-- Battery timeline reconstructed from the macOS power log
-- Live whole-system watts from `AppleSmartBattery`
-- Relative application impact from current CPU and memory activity
+- Full charge timeline reconstructed from the macOS power log
+- Live whole-system watts from `AppleSmartBattery`, retained through the session
+- Application Energy Impact sampled every 30 seconds and charted over time
+- Per-application observed share, estimated charge equivalent, active time, average impact, and peak impact
+- Explicit session-coverage reporting so estimates never imply data existed before monitoring began
 - Battery capacity, cycles, and temperature
 - Menu-bar summary and full desktop window
 - Optional low-battery and full-charge notifications
 - Bounded ten-day local history under Application Support
 
-> macOS does not expose trustworthy per-app watt measurements. WattHound labels application impact as an estimate and keeps measured system power separate.
+> macOS does not expose trustworthy historical per-app watt-hours. WattHound uses Apple’s relative Energy Impact for application attribution, labels it as an estimate, and keeps measured system power separate.
 
 ## Requirements
 
@@ -48,7 +50,8 @@ WattHound executes fixed absolute-path macOS utilities without a shell:
 | Charge, source, remaining time | `pmset -g batt` |
 | Charge-session history | `pmset -g log` |
 | Watts, cycles, capacity, temperature | `ioreg -rn AppleSmartBattery` |
-| Current application activity | `ps -axo ...` |
+| Application paths and memory | `ps -axo ...` |
+| Relative application Energy Impact | `top -l 2 -stats ...` |
 
 No observations leave the Mac. WattHound contains no analytics or account system.
 

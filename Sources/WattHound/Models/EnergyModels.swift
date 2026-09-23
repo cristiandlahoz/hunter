@@ -32,7 +32,7 @@ struct PowerSample: Codable, Sendable, Identifiable, Equatable {
     let isOnAC: Bool
 }
 
-struct AppImpact: Sendable, Identifiable, Equatable {
+struct AppImpact: Codable, Sendable, Identifiable, Equatable {
     let id: String
     let name: String
     let executablePath: String
@@ -40,6 +40,32 @@ struct AppImpact: Sendable, Identifiable, Equatable {
     let cpuPercentage: Double
     let memoryBytes: UInt64
     let relativeImpact: Double
+}
+
+struct ProcessActivitySnapshot: Sendable {
+    let capturedAt: Date
+    let applications: [AppImpact]
+    let totalSystemImpact: Double
+}
+
+struct AppActivityFrame: Codable, Sendable, Identifiable, Equatable {
+    var id: Date { capturedAt }
+    let capturedAt: Date
+    let batteryPercentage: Int
+    let systemWatts: Double?
+    let totalSystemImpact: Double
+    let applications: [AppImpact]
+}
+
+struct AppAttribution: Sendable, Identifiable, Equatable {
+    let id: String
+    let name: String
+    let executablePath: String
+    let observedShare: Double
+    let equivalentCharge: Double
+    let activeDuration: TimeInterval
+    let averageImpact: Double
+    let peakImpact: Double
 }
 
 struct BatterySession: Sendable, Equatable {
@@ -76,6 +102,15 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
         case .applications: "list.bullet.rectangle"
         case .history: "chart.xyaxis.line"
         case .battery: "battery.75percent"
+        }
+    }
+
+    var shortcut: Character {
+        switch self {
+        case .session: "1"
+        case .applications: "2"
+        case .history: "3"
+        case .battery: "4"
         }
     }
 }

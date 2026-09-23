@@ -30,7 +30,7 @@ struct DashboardView: View {
                     Text("Likely contributors")
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(WattColors.ink)
-                    Text("Estimated from current CPU and memory activity")
+                    Text("Current macOS Energy Impact")
                         .font(.system(size: 11))
                         .foregroundStyle(WattColors.secondary)
                     Spacer()

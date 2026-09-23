@@ -47,4 +47,4 @@ The sidebar is 224 points wide and never becomes a floating card. Content has a 
 
 ## Interaction
 
-Selection is immediate, with a violet text/icon treatment over a navy hover field. Refresh rotates the symbol once only when work is active and respects Reduce Motion. Every status combines an icon or label with color. Empty and error states remain in the sheet instead of opening modal dialogs.
+Selection is immediate, with a violet text/icon treatment over a navy hover field. History charts share a hover crosshair and expose exact time, charge, and measured watts without opening a modal. Refresh rotates the symbol once only when work is active and respects Reduce Motion. Every status combines an icon or label with color. Empty and error states remain in the sheet instead of opening modal dialogs.

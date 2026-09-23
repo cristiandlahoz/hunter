@@ -103,7 +103,7 @@ private struct ImpactBar: View {
     }
 }
 
-private struct AppIcon: View {
+struct AppIcon: View {
     let path: String
 
     var body: some View {

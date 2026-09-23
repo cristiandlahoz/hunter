@@ -41,59 +41,92 @@ actor SystemProbe {
         )
     }
 
-    func applicationImpact() -> [AppImpact] {
-        let result = CommandRunner.run(
+    func applicationImpact() -> ProcessActivitySnapshot {
+        let capturedAt = Date()
+        let processList = CommandRunner.run(
             "/bin/ps",
-            arguments: ["-axo", "pid=,pcpu=,rss=,comm="],
+            arguments: ["-axo", "pid=,rss=,comm="],
             timeout: 5
         )
-        guard result.succeeded else { return [] }
+        let energy = CommandRunner.run(
+            "/usr/bin/top",
+            arguments: ["-l", "2", "-s", "1", "-n", "200", "-o", "power", "-stats", "pid,cpu,power"],
+            timeout: 8
+        )
+        guard processList.succeeded, energy.succeeded else {
+            return ProcessActivitySnapshot(capturedAt: capturedAt, applications: [], totalSystemImpact: 0)
+        }
+
+        struct ProcessInfo {
+            let memory: UInt64
+            let path: String
+        }
+        var processInfo: [Int: ProcessInfo] = [:]
+        for line in processList.output.split(separator: "\n") {
+            let fields = line.split(maxSplits: 2, whereSeparator: { $0.isWhitespace })
+            guard fields.count == 3, let pid = Int(fields[0]), let rss = UInt64(fields[1]) else { continue }
+            processInfo[pid] = ProcessInfo(memory: rss * 1_024, path: String(fields[2]))
+        }
 
         struct Aggregate {
             var count = 0
             var cpu = 0.0
+            var power = 0.0
             var memory: UInt64 = 0
             var path = ""
         }
         var groups: [String: Aggregate] = [:]
-
-        for line in result.output.split(separator: "\n") {
-            let fields = line.split(maxSplits: 3, whereSeparator: { $0.isWhitespace })
-            guard fields.count == 4,
-                  Double(fields[1]) != nil,
-                  UInt64(fields[2]) != nil else { continue }
-            let cpu = Double(fields[1]) ?? 0
-            let memory = (UInt64(fields[2]) ?? 0) * 1_024
-            let path = String(fields[3])
-            guard !path.contains("WattHound"), Self.isUserRelevantProcess(path) else { continue }
-            let identity = Self.applicationIdentity(for: path)
-            var aggregate = groups[identity.name, default: Aggregate()]
-            aggregate.count += 1
-            aggregate.cpu += cpu
-            aggregate.memory += memory
-            if aggregate.path.isEmpty || identity.path.contains(".app/") {
-                aggregate.path = identity.path
-            }
-            groups[identity.name] = aggregate
+        var totalSystemImpact = 0.0
+        let rows = energy.output.split(separator: "\n").map(String.init)
+        let lastHeader = rows.lastIndex { $0.hasPrefix("PID") } ?? rows.endIndex
+        guard lastHeader < rows.endIndex else {
+            return ProcessActivitySnapshot(capturedAt: capturedAt, applications: [], totalSystemImpact: 0)
         }
 
-        return groups.map { name, value in
-            let memoryGB = Double(value.memory) / 1_073_741_824
-            let score = value.cpu + min(memoryGB * 3, 12)
+        for line in rows.dropFirst(lastHeader + 1) {
+            let fields = line.split(whereSeparator: { $0.isWhitespace })
+            guard fields.count >= 3,
+                  let pid = Int(fields[0]),
+                  let cpu = Double(fields[1]),
+                  let power = Double(fields[2]),
+                  let info = processInfo[pid],
+                  !info.path.contains("WattHound"),
+                  info.path != "/usr/bin/top" else { continue }
+            totalSystemImpact += power
+            guard Self.isUserRelevantProcess(info.path) else { continue }
+            let identity = Self.applicationIdentity(for: info.path)
+            let key = identity.name + identity.path
+            var aggregate = groups[key, default: Aggregate()]
+            aggregate.count += 1
+            aggregate.cpu += cpu
+            aggregate.power += power
+            aggregate.memory += info.memory
+            if aggregate.path.isEmpty || identity.path.contains(".app/") { aggregate.path = identity.path }
+            groups[key] = aggregate
+        }
+
+        let applications = groups.map { key, value in
+            let name = key.replacingOccurrences(of: value.path, with: "")
             return AppImpact(
-                id: name + value.path,
+                id: key,
                 name: name,
                 executablePath: value.path,
                 processCount: value.count,
                 cpuPercentage: value.cpu,
                 memoryBytes: value.memory,
-                relativeImpact: score
+                relativeImpact: value.power
             )
         }
-        .filter { $0.cpuPercentage >= 0.1 || $0.memoryBytes >= 50 * 1_048_576 }
+        .filter { $0.relativeImpact >= 0.1 || $0.cpuPercentage >= 0.1 }
         .sorted { $0.relativeImpact > $1.relativeImpact }
         .prefix(40)
         .map { $0 }
+
+        return ProcessActivitySnapshot(
+            capturedAt: capturedAt,
+            applications: applications,
+            totalSystemImpact: max(totalSystemImpact, applications.reduce(0) { $0 + $1.relativeImpact })
+        )
     }
 
     func systemPowerHistory() -> [PowerSample] {

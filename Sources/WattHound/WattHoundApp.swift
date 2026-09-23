@@ -4,6 +4,7 @@ import SwiftUI
 @main
 struct WattHoundApp: App {
     @StateObject private var store = EnergyStore()
+    @AppStorage("showMenuBarPercentage") private var showMenuBarPercentage = true
 
     var body: some Scene {
         WindowGroup("WattHound", id: "main") {
@@ -27,19 +28,15 @@ struct WattHoundApp: App {
             MenuBarView(store: store)
                 .onAppear { store.start() }
         } label: {
-            Label("WattHound \(store.snapshot.percentage)%", systemImage: menuSymbol)
+            HStack(spacing: 3) {
+                AnimatedMenuBarHound()
+                if showMenuBarPercentage {
+                    Text("\(store.snapshot.percentage)%")
+                        .monospacedDigit()
+                }
+            }
+            .accessibilityLabel("WattHound, \(store.snapshot.percentage) percent")
         }
         .menuBarExtraStyle(.window)
-    }
-
-    private var menuSymbol: String {
-        if store.snapshot.isCharging { return "battery.100percent.bolt" }
-        switch store.snapshot.percentage {
-        case 76...: return "battery.100percent"
-        case 51...: return "battery.75percent"
-        case 26...: return "battery.50percent"
-        case 11...: return "battery.25percent"
-        default: return "battery.0percent"
-        }
     }
 }

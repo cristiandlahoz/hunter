@@ -26,6 +26,7 @@ if [[ ! -f "$ROOT/Resources/WattHound.icns" ]]; then
   iconutil -c icns "$WORK/WattHound.iconset" -o "$ROOT/Resources/WattHound.icns"
 fi
 cp "$ROOT/Resources/WattHound.icns" "$CONTENTS/Resources/WattHound.icns"
+cp -R "$BIN_DIR/WattHound_WattHound.bundle" "$CONTENTS/Resources/"
 
 codesign --force --deep --sign - "$APP" >/dev/null
 printf 'Built %s\n' "$APP"

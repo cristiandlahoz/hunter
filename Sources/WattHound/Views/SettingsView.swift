@@ -4,6 +4,7 @@ struct SettingsView: View {
     @ObservedObject var store: EnergyStore
     @AppStorage("monitoringEnabled") private var monitoringEnabled = true
     @AppStorage("notificationsEnabled") private var notificationsEnabled = false
+    @AppStorage("showMenuBarPercentage") private var showMenuBarPercentage = true
     @State private var notificationError: String?
 
     var body: some View {
@@ -11,6 +12,13 @@ struct SettingsView: View {
             Section("Monitoring") {
                 Toggle("Sample battery activity in the background", isOn: $monitoringEnabled)
                 Text("Battery state is sampled every 15 seconds. Application activity is sampled every 30 seconds.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section("Menu Bar") {
+                Toggle("Show battery percentage beside the hound", isOn: $showMenuBarPercentage)
+                Text("The bloodhound icon remains visible when the percentage is hidden.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -46,6 +54,6 @@ struct SettingsView: View {
         .formStyle(.grouped)
         .tint(WattColors.violet)
         .padding(8)
-        .frame(width: 480, height: 410)
+        .frame(width: 480, height: 480)
     }
 }

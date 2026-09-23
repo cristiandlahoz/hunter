@@ -176,42 +176,59 @@ struct HistoryView: View {
         } else {
             let minimum = sessionSamples.map(\.percentage).min() ?? 0
             let lowerBound = max(0, (minimum / 10 * 10) - 10)
-            Chart(sessionSamples) { sample in
-                AreaMark(
-                    x: .value("Time", sample.capturedAt),
-                    yStart: .value("Visible baseline", lowerBound),
-                    yEnd: .value("Charge", sample.percentage)
-                )
-                .foregroundStyle(WattColors.violet.opacity(0.1))
-                .interpolationMethod(.stepEnd)
-                LineMark(
-                    x: .value("Time", sample.capturedAt),
-                    y: .value("Charge", sample.percentage)
-                )
-                .foregroundStyle(WattColors.violet)
-                .lineStyle(StrokeStyle(lineWidth: 2))
-                .interpolationMethod(.stepEnd)
+            Chart {
+                ForEach(sessionSamples) { sample in
+                    AreaMark(
+                        x: .value("Time", sample.capturedAt),
+                        yStart: .value("Visible baseline", lowerBound),
+                        yEnd: .value("Charge", sample.percentage)
+                    )
+                    .foregroundStyle(WattColors.violet.opacity(0.1))
+                    .interpolationMethod(.stepEnd)
+                    LineMark(
+                        x: .value("Time", sample.capturedAt),
+                        y: .value("Charge", sample.percentage)
+                    )
+                    .foregroundStyle(WattColors.violet)
+                    .lineStyle(StrokeStyle(lineWidth: 2))
+                    .interpolationMethod(.stepEnd)
+                }
                 if let selectedSample {
                     RuleMark(x: .value("Selected time", selectedSample.capturedAt))
-                        .foregroundStyle(WattColors.ink.opacity(0.55))
+                        .foregroundStyle(WattColors.secondary.opacity(0.7))
                         .lineStyle(StrokeStyle(lineWidth: 1, dash: [3, 3]))
-                        .annotation(position: .top, alignment: .leading) {
-                            VStack(alignment: .leading, spacing: 2) {
+                        .annotation(position: .top, alignment: .center, spacing: 6) {
+                            HStack(alignment: .firstTextBaseline, spacing: 8) {
                                 Text(selectedSample.capturedAt.formatted(date: .omitted, time: .shortened))
-                                Text("\(selectedSample.percentage)%" + (selectedSample.watts.map { String(format: " · %.1f W", $0) } ?? ""))
+                                    .foregroundStyle(WattColors.secondary)
+                                Text("\(selectedSample.percentage)%")
                                     .fontWeight(.semibold)
+                                    .foregroundStyle(WattColors.violet)
+                                if let watts = selectedSample.watts {
+                                    Text(String(format: "%.1f W", watts))
+                                        .foregroundStyle(WattColors.ink)
+                                }
                             }
-                            .font(.system(size: 10))
-                            .foregroundStyle(WattColors.ink)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 6)
+                            .font(.system(size: 11))
+                            .monospacedDigit()
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 7)
                             .background(Color.white, in: RoundedRectangle(cornerRadius: 6))
-                            .shadow(color: .black.opacity(0.12), radius: 4, y: 2)
+                            .shadow(color: .black.opacity(0.12), radius: 5, y: 2)
                         }
+                    PointMark(
+                        x: .value("Selected time", selectedSample.capturedAt),
+                        y: .value("Charge", selectedSample.percentage)
+                    )
+                    .foregroundStyle(WattColors.violet)
+                    .symbolSize(48)
                 }
             }
             .chartYScale(domain: lowerBound...100)
-            .chartXScale(range: .plotDimension(startPadding: 6, endPadding: 50))
+            .chartXScale(
+                domain: sessionSamples[0].capturedAt...sessionSamples[sessionSamples.count - 1].capturedAt,
+                range: .plotDimension(startPadding: 6, endPadding: 50)
+            )
             .chartYAxisLabel("Charge")
             .chartYAxis { AxisMarks(position: .leading, values: .automatic(desiredCount: 5)) }
             .chartXAxis { AxisMarks(values: .automatic(desiredCount: 8)) }
@@ -239,26 +256,31 @@ struct HistoryView: View {
         if measuredPowerSamples.count < 2 {
             emptyChart("Live watts appear while WattHound is running", symbol: "bolt")
         } else {
-            Chart(measuredPowerSamples) { sample in
-                LineMark(
-                    x: .value("Time", sample.capturedAt),
-                    y: .value("Watts", sample.watts ?? 0)
-                )
-                .foregroundStyle(WattColors.energy)
-                .lineStyle(StrokeStyle(lineWidth: 1.6))
-                PointMark(
-                    x: .value("Time", sample.capturedAt),
-                    y: .value("Watts", sample.watts ?? 0)
-                )
-                .foregroundStyle(WattColors.energy)
-                .symbolSize(8)
+            Chart {
+                ForEach(measuredPowerSamples) { sample in
+                    LineMark(
+                        x: .value("Time", sample.capturedAt),
+                        y: .value("Watts", sample.watts ?? 0)
+                    )
+                    .foregroundStyle(WattColors.energy)
+                    .lineStyle(StrokeStyle(lineWidth: 1.6))
+                    PointMark(
+                        x: .value("Time", sample.capturedAt),
+                        y: .value("Watts", sample.watts ?? 0)
+                    )
+                    .foregroundStyle(WattColors.energy)
+                    .symbolSize(8)
+                }
                 if let selectedSample {
                     RuleMark(x: .value("Selected time", selectedSample.capturedAt))
-                        .foregroundStyle(WattColors.ink.opacity(0.4))
+                        .foregroundStyle(WattColors.secondary.opacity(0.7))
                         .lineStyle(StrokeStyle(lineWidth: 1, dash: [3, 3]))
                 }
             }
-            .chartXScale(range: .plotDimension(startPadding: 6, endPadding: 50))
+            .chartXScale(
+                domain: sessionSamples[0].capturedAt...sessionSamples[sessionSamples.count - 1].capturedAt,
+                range: .plotDimension(startPadding: 6, endPadding: 50)
+            )
             .chartYAxisLabel("Watts")
             .chartYAxis { AxisMarks(position: .leading, values: .automatic(desiredCount: 3)) }
             .chartXAxis(.hidden)

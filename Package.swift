@@ -11,6 +11,9 @@ let package = Package(
         .executableTarget(
             name: "WattHound",
             path: "Sources/WattHound",
+            resources: [
+                .copy("Resources")
+            ],
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency")
             ]

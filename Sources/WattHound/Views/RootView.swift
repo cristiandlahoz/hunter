@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct RootView: View {
@@ -62,6 +63,10 @@ struct MenuBarView: View {
                 openWindow(id: "main")
             }
             Button("Refresh now") { Task { await store.refresh() } }
+            Button("Settings…") {
+                NSApplication.shared.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+                NSApplication.shared.activate(ignoringOtherApps: true)
+            }
             Divider()
             Button("Quit WattHound") { NSApplication.shared.terminate(nil) }
         }

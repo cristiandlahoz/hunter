@@ -19,6 +19,10 @@ struct WattHoundApp: App {
             }
         }
 
+        Settings {
+            SettingsView(store: store)
+        }
+
         MenuBarExtra {
             MenuBarView(store: store)
                 .onAppear { store.start() }

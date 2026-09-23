@@ -12,6 +12,7 @@ final class EnergyStore: ObservableObject {
 
     private let probe = SystemProbe()
     private let historyStore = HistoryStore()
+    private let notificationService = NotificationService()
     private var refreshTimer: Timer?
     private var processRefreshCounter = 0
     private var lastPersistedAt: Date?
@@ -71,9 +72,15 @@ final class EnergyStore: ObservableObject {
             errorMessage = "WattHound couldn’t read the current battery state. Try refreshing."
             return
         }
+        let previousSnapshot = snapshot
         snapshot = newSnapshot
         errorMessage = nil
         appendSample(from: newSnapshot)
+        await notificationService.evaluate(
+            previous: previousSnapshot,
+            current: newSnapshot,
+            enabled: UserDefaults.standard.bool(forKey: "notificationsEnabled")
+        )
 
         processRefreshCounter += 1
         if applications.isEmpty || processRefreshCounter >= 2 {
@@ -84,6 +91,10 @@ final class EnergyStore: ObservableObject {
 
     func refreshApplications() async {
         applications = await probe.applicationImpact()
+    }
+
+    func enableNotifications() async -> Bool {
+        await notificationService.requestAuthorization()
     }
 
     private func bootstrap() async {

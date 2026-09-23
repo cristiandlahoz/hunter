@@ -12,6 +12,7 @@ WattHound is deliberately not another circular battery gauge. It joins the curre
 - Relative application impact from current CPU and memory activity
 - Battery capacity, cycles, and temperature
 - Menu-bar summary and full desktop window
+- Optional low-battery and full-charge notifications
 - Bounded ten-day local history under Application Support
 
 > macOS does not expose trustworthy per-app watt measurements. WattHound labels application impact as an estimate and keeps measured system power separate.

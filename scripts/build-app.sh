@@ -28,5 +28,10 @@ fi
 cp "$ROOT/Resources/WattHound.icns" "$CONTENTS/Resources/WattHound.icns"
 cp -R "$BIN_DIR/WattHound_WattHound.bundle" "$CONTENTS/Resources/"
 
-codesign --force --deep --sign - "$APP" >/dev/null
+SIGNING_IDENTITY="${WATTHOUND_SIGNING_IDENTITY:-Local Self-Signed}"
+if security find-identity -v -p codesigning | grep -Fq "\"$SIGNING_IDENTITY\""; then
+  codesign --force --deep --sign "$SIGNING_IDENTITY" "$APP" >/dev/null
+else
+  codesign --force --deep --sign - "$APP" >/dev/null
+fi
 printf 'Built %s\n' "$APP"

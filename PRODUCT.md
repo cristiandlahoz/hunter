@@ -35,7 +35,8 @@ The app runs quietly in the macOS menu bar and opens into a desktop window for i
 - Relative application-impact ranking and session attribution based on sampled macOS Energy Impact; macOS does not expose trustworthy historical per-app watt-hours.
 - Explicit attribution coverage, observed share, estimated charge equivalent, active time, average impact, and peak impact for each sampled application.
 - Menu-bar status and desktop dashboard.
-- No cloud account, analytics, Electron runtime, or mandatory administrator privileges.
+- Optional ChatGPT Codex usage limits, authenticated directly with OpenAI and stored in macOS Keychain.
+- No WattHound account, analytics, Electron runtime, or mandatory administrator privileges.
 
 ## Brand Commitments
 

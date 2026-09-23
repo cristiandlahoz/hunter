@@ -30,6 +30,7 @@ struct RootView: View {
 
 struct MenuBarView: View {
     @ObservedObject var store: EnergyStore
+    @ObservedObject var chatGPTUsage: ChatGPTUsageStore
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
@@ -58,6 +59,9 @@ struct MenuBarView: View {
             }
 
             Divider()
+            ChatGPTMenuUsage(store: chatGPTUsage)
+
+            Divider()
             Button("Open WattHound") {
                 NSApplication.shared.activate(ignoringOtherApps: true)
                 openWindow(id: "main")
@@ -68,10 +72,80 @@ struct MenuBarView: View {
                 NSApplication.shared.activate(ignoringOtherApps: true)
             }
             Divider()
-            Button("Quit WattHound") { NSApplication.shared.terminate(nil) }
+            Button("Quit WattHound Completely") {
+                WattHoundAppDelegate.shared?.quitCompletely()
+            }
         }
         .padding(12)
         .frame(width: 280)
+    }
+}
+
+private struct ChatGPTMenuUsage: View {
+    @ObservedObject var store: ChatGPTUsageStore
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            HStack {
+                Label("ChatGPT Codex", systemImage: "sparkles")
+                    .font(.caption.weight(.semibold))
+                Spacer()
+                if store.isRefreshing {
+                    ProgressView().controlSize(.mini)
+                } else if store.isConnected {
+                    Button {
+                        Task { await store.refresh() }
+                    } label: {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                    .buttonStyle(.plain)
+                    .help("Refresh ChatGPT usage")
+                }
+            }
+
+            if let usage = store.usage {
+                HStack {
+                    if let session = usage.session {
+                        ChatGPTUsageMetric(label: "Session", window: session)
+                    }
+                    if let weekly = usage.weekly {
+                        ChatGPTUsageMetric(label: "Weekly", window: weekly)
+                    }
+                    if !usage.isAllowed {
+                        MenuMetric(label: "Status", value: "Limit reached")
+                    }
+                }
+            } else if store.isConnected {
+                Text(store.errorMessage ?? "Loading usage…")
+                    .font(.caption)
+                    .foregroundStyle(store.errorMessage == nil ? .secondary : WattColors.critical)
+            } else {
+                Text("Connect ChatGPT in Settings to show usage limits.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+}
+
+private struct ChatGPTUsageMetric: View {
+    let label: String
+    let window: ChatGPTUsageWindow
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(label).font(.caption2).foregroundStyle(.secondary)
+            Text("\(Int(window.remainingPercent.rounded()))% left")
+                .font(.caption.weight(.semibold))
+                .monospacedDigit()
+            if let resetsAt = window.resetsAt {
+                Text("Resets \(resetsAt, style: .relative)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .combine)
     }
 }
 

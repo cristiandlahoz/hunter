@@ -14,6 +14,7 @@ WattHound is deliberately not another circular battery gauge. It joins the curre
 - Explicit session-coverage reporting so estimates never imply data existed before monitoring began
 - Battery capacity, cycles, and temperature
 - Menu-bar summary and full desktop window
+- Optional ChatGPT Codex session and weekly usage limits
 - Optional low-battery and full-charge notifications
 - Bounded ten-day local history under Application Support
 
@@ -52,8 +53,9 @@ WattHound executes fixed absolute-path macOS utilities without a shell:
 | Watts, cycles, capacity, temperature | `ioreg -rn AppleSmartBattery` |
 | Application paths and memory | `ps -axo ...` |
 | Relative application Energy Impact | `top -l 2 -stats ...` |
+| Optional Codex usage limits | OpenAI OAuth and `chatgpt.com/backend-api/codex/usage` |
 
-No observations leave the Mac. WattHound contains no analytics or account system.
+Battery and process observations never leave the Mac. WattHound contains no analytics or account system. If you connect ChatGPT, the app stores the OAuth credential in macOS Keychain and sends it only to OpenAI to refresh the credential and fetch Codex usage limits.
 
 ## Design
 

@@ -100,6 +100,7 @@ actor NotificationService {
         content.title = title
         content.body = body
         content.sound = .default
+        content.interruptionLevel = .timeSensitive
         try? await UNUserNotificationCenter.current().add(
             UNNotificationRequest(identifier: identifier, content: content, trigger: nil)
         )

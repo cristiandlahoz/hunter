@@ -1,8 +1,9 @@
 import AppKit
 import SwiftUI
+import UserNotifications
 
 @MainActor
-final class WattHoundAppDelegate: NSObject, NSApplicationDelegate {
+final class WattHoundAppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
     static weak var shared: WattHoundAppDelegate?
     private var shouldTerminateCompletely = false
 
@@ -12,6 +13,7 @@ final class WattHoundAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        UNUserNotificationCenter.current().delegate = self
         NSApplication.shared.setActivationPolicy(.accessory)
         DispatchQueue.main.async {
             NSApplication.shared.windows
@@ -22,6 +24,14 @@ final class WattHoundAppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         false
+    }
+
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
+        completionHandler([.banner, .list, .sound])
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

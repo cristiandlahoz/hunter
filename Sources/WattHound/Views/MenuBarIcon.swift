@@ -41,14 +41,10 @@ enum MenuBarIcon {
             .foregroundColor: NSColor.black
         ]
 
-        let itemSpacing: CGFloat = 2
-        let batteryWidth = batteryText.map {
-            ceil(($0 as NSString).size(withAttributes: batteryAttributes).width)
-                + (usageRows.isEmpty ? 0 : itemSpacing)
-        } ?? 0
+        let batteryWidth = batteryText.map { ceil(($0 as NSString).size(withAttributes: batteryAttributes).width) + 5 } ?? 0
         let usageWidth = ceil(usageRows.map { $0.size().width }.max() ?? 0)
         let textWidth = batteryWidth + usageWidth
-        let imageWidth = 18 + (textWidth > 0 ? itemSpacing + textWidth : 0)
+        let imageWidth = 18 + (textWidth > 0 ? 4 + textWidth : 0)
 
         let image = NSImage(size: NSSize(width: imageWidth, height: 18), flipped: true) { _ in
             trackingHound.draw(
@@ -60,7 +56,7 @@ enum MenuBarIcon {
                 hints: nil
             )
 
-            var x: CGFloat = 18 + itemSpacing
+            var x: CGFloat = 22
             if let batteryText {
                 let size = (batteryText as NSString).size(withAttributes: batteryAttributes)
                 (batteryText as NSString).draw(

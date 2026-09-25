@@ -12,15 +12,15 @@ Native Swift and SwiftUI, delegated by the user with performance and low resourc
 
 ## Users
 
-MacBook users who want to understand a battery session without reconstructing it from several macOS utilities. They open WattHound while unplugged to answer when the session began, how quickly charge is falling, and which applications are likely contributing.
+MacBook users who want to understand a battery session without reconstructing it from several macOS utilities. They open Hunter while unplugged to answer when the session began, how quickly charge is falling, and which applications are likely contributing.
 
 ## Product Purpose
 
-WattHound tracks battery state, discharge, charge sessions, health, and application activity locally. Success means the current unplugged session is immediately understandable and the user can identify likely drains without granting broad permissions or uploading telemetry.
+Hunter tracks battery state, discharge, charge sessions, health, and application activity locally. Success means the current unplugged session is immediately understandable and the user can identify likely drains without granting broad permissions or uploading telemetry.
 
 ## Positioning
 
-WattHound treats energy as a ledger: one continuous session timeline joined to a dense, inspectable process list. It distinguishes measured system power from estimated per-app impact rather than presenting estimates as per-app watts.
+Hunter treats energy as a ledger: one continuous session timeline joined to a dense, inspectable process list. It distinguishes measured system power from estimated per-app impact rather than presenting estimates as per-app watts.
 
 ## Operating Context
 
@@ -35,12 +35,15 @@ The app runs quietly in the macOS menu bar and opens into a desktop window for i
 - Relative application-impact ranking and session attribution based on sampled macOS Energy Impact; macOS does not expose trustworthy historical per-app watt-hours.
 - Explicit attribution coverage, observed share, estimated charge equivalent, active time, average impact, and peak impact for each sampled application.
 - Menu-bar status and desktop dashboard.
+- Local development-server discovery with Vaadin recognition, project and branch context, resource use, and direct browser links.
+- Start, inspect, copy, open, and stop public tunnels through ngrok, with automatic Homebrew or app-managed installation when the binary is missing.
+- Configurable per-server process-tree memory alerts, defaulting to 2 GB.
 - Optional ChatGPT Codex usage limits, authenticated directly with OpenAI and stored in macOS Keychain.
-- No WattHound account, analytics, Electron runtime, or mandatory administrator privileges.
+- No Hunter account, analytics, Electron runtime, or mandatory administrator privileges.
 
 ## Brand Commitments
 
-The product name is WattHound. Its interface should inherit the useful qualities of Actual Budget: a dark, highly legible sidebar; light data workspace; compact tables; direct labels; and restrained violet selection. It must remain recognizably native to macOS rather than copying a web application literally.
+The product name is Hunter. Its interface should inherit the useful qualities of Actual Budget: a dark, highly legible sidebar; light data workspace; compact tables; direct labels; and restrained violet selection. It must remain recognizably native to macOS rather than copying a web application literally.
 
 ## Evidence on Hand
 

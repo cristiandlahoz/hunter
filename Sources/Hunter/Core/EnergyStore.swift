@@ -96,7 +96,7 @@ final class EnergyStore: ObservableObject {
         defer { isRefreshing = false }
 
         guard let newSnapshot = await probe.batterySnapshot() else {
-            errorMessage = "WattHound couldn’t read the current battery state. Try refreshing."
+            errorMessage = "Hunter couldn’t read the current battery state. Try refreshing."
             return
         }
         let previousSnapshot = snapshot

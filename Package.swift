@@ -2,15 +2,15 @@
 import PackageDescription
 
 let package = Package(
-    name: "WattHound",
+    name: "Hunter",
     platforms: [.macOS(.v13)],
     products: [
-        .executable(name: "WattHound", targets: ["WattHound"])
+        .executable(name: "Hunter", targets: ["Hunter"])
     ],
     targets: [
         .executableTarget(
-            name: "WattHound",
-            path: "Sources/WattHound",
+            name: "Hunter",
+            path: "Sources/Hunter",
             resources: [
                 .copy("Resources")
             ],
@@ -19,9 +19,9 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "WattHoundTests",
-            dependencies: ["WattHound"],
-            path: "Tests/WattHoundTests"
+            name: "HunterTests",
+            dependencies: ["Hunter"],
+            path: "Tests/HunterTests"
         )
     ]
 )

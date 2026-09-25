@@ -90,7 +90,7 @@ actor SystemProbe {
                   let cpu = Double(fields[1]),
                   let power = Double(fields[2]),
                   let info = processInfo[pid],
-                  !info.path.contains("WattHound"),
+                  !info.path.contains("Hunter"),
                   info.path != "/usr/bin/top" else { continue }
             totalSystemImpact += power
             guard Self.isUserRelevantProcess(info.path) else { continue }

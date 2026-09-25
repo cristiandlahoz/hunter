@@ -8,7 +8,7 @@ enum MenuBarIcon {
             withExtension: "svg",
             subdirectory: "Resources"
         ).flatMap(NSImage.init(contentsOf:))!
-        image.accessibilityDescription = "WattHound"
+        image.accessibilityDescription = "Hunter"
         image.size = NSSize(width: 18, height: 18)
         image.isTemplate = true
         return image
@@ -108,7 +108,7 @@ struct MenuBarStatusLabel: View {
     }
 
     private var accessibilitySummary: String {
-        var parts = ["WattHound"]
+        var parts = ["Hunter"]
         if showBatteryPercentage { parts.append("battery \(batteryPercentage) percent") }
         for window in usageWindows {
             parts.append("ChatGPT \(window.accessibilityLabel), \(Int(window.remainingPercent.rounded())) percent remaining")

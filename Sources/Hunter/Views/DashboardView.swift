@@ -103,7 +103,7 @@ struct DashboardView: View {
                     .foregroundStyle(WattColors.violet)
                 Text("Building this session’s timeline")
                     .font(.system(size: 13, weight: .medium))
-                Text("WattHound will add a point as the battery changes.")
+                Text("Hunter will add a point as the battery changes.")
                     .font(.system(size: 11))
                     .foregroundStyle(WattColors.secondary)
             }

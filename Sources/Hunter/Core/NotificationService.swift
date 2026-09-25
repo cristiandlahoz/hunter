@@ -1,9 +1,31 @@
 import Foundation
 import UserNotifications
 
+struct ServerMemoryAlertTracker {
+    private(set) var alertedServerIDs: Set<String> = []
+
+    mutating func newAlerts(servers: [DevServer], thresholdBytes: UInt64) -> [DevServer] {
+        let resetBelow = UInt64(Double(thresholdBytes) * 0.9)
+        let activeIDs = Set(servers.map { String($0.pid) })
+        alertedServerIDs = alertedServerIDs.filter { id in
+            activeIDs.contains(id) && servers.first(where: { String($0.pid) == id }).map { $0.memoryBytes >= resetBelow } == true
+        }
+        var newProcessIDs: Set<String> = []
+        let alerts = servers.filter { server in
+            let processID = String(server.pid)
+            return server.memoryBytes >= thresholdBytes
+                && !alertedServerIDs.contains(processID)
+                && newProcessIDs.insert(processID).inserted
+        }
+        alertedServerIDs.formUnion(newProcessIDs)
+        return alerts
+    }
+}
+
 actor NotificationService {
     private var sentLowBattery = false
     private var sentFullCharge = false
+    private var serverMemoryTracker = ServerMemoryAlertTracker()
 
     func evaluate(previous: BatterySnapshot, current: BatterySnapshot, enabled: Bool) async {
         guard enabled else { return }
@@ -14,7 +36,7 @@ actor NotificationService {
         if !current.isOnAC, current.percentage <= 20, previous.percentage > 20, !sentLowBattery {
             await send(
                 title: "Battery is at \(current.percentage)%",
-                body: "WattHound estimates \(Formatters.time(current.timeRemainingMinutes)) remaining.",
+                body: "Hunter estimates \(Formatters.time(current.timeRemainingMinutes)) remaining.",
                 identifier: "low-battery"
             )
             sentLowBattery = true
@@ -67,6 +89,22 @@ actor NotificationService {
         }
     }
 
+    func evaluateServerMemory(servers: [DevServer], thresholdBytes: UInt64, enabled: Bool) async {
+        guard enabled else { return }
+        let center = UNUserNotificationCenter.current()
+        let settings = await center.notificationSettings()
+        guard settings.authorizationStatus == .authorized else { return }
+        let alerts = serverMemoryTracker.newAlerts(servers: servers, thresholdBytes: thresholdBytes)
+
+        for server in alerts {
+            await send(
+                title: "\(server.projectName) passed the memory limit",
+                body: "Port \(server.port) is using \(Formatters.memory(server.memoryBytes)); your limit is \(Formatters.memory(thresholdBytes)).",
+                identifier: "server-memory-\(server.id)-\(thresholdBytes)"
+            )
+        }
+    }
+
     func requestAuthorization() async -> Bool {
         (try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound])) ?? false
     }
@@ -101,6 +139,8 @@ actor NotificationService {
         content.body = body
         content.sound = .default
         content.interruptionLevel = .timeSensitive
+        content.threadIdentifier = "com.cristiandlahoz.hunter"
+        content.targetContentIdentifier = "Hunter"
         try? await UNUserNotificationCenter.current().add(
             UNNotificationRequest(identifier: identifier, content: content, trigger: nil)
         )

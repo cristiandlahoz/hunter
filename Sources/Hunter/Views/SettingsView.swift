@@ -7,6 +7,8 @@ struct SettingsView: View {
     @AppStorage("monitoringEnabled") private var monitoringEnabled = true
     @AppStorage("notificationsEnabled") private var notificationsEnabled = false
     @AppStorage("chatGPTUsageNotificationsEnabled") private var chatGPTUsageNotificationsEnabled = true
+    @AppStorage("serverMemoryAlertsEnabled") private var serverMemoryAlertsEnabled = true
+    @AppStorage("serverMemoryThresholdGB") private var serverMemoryThresholdGB = 2.0
     @AppStorage("showMenuBarPercentage") private var showMenuBarPercentage = true
     @State private var notificationError: String?
 
@@ -34,6 +36,21 @@ struct SettingsView: View {
                         }
                     }
 
+                Toggle("Server memory alerts", isOn: $serverMemoryAlertsEnabled)
+                    .onChange(of: serverMemoryAlertsEnabled) { enabled in
+                        requestNotificationAccess(when: enabled) {
+                            serverMemoryAlertsEnabled = false
+                        }
+                    }
+
+                Stepper(
+                    "Alert above \(memoryThresholdLabel) per server",
+                    value: $serverMemoryThresholdGB,
+                    in: 0.25...64,
+                    step: 0.25
+                )
+                .disabled(!serverMemoryAlertsEnabled)
+
                 Toggle("ChatGPT pace alerts every 10% consumed", isOn: $chatGPTUsageNotificationsEnabled)
                     .onChange(of: chatGPTUsageNotificationsEnabled) { enabled in
                         requestNotificationAccess(when: enabled) {
@@ -46,7 +63,7 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundStyle(WattColors.critical)
                 } else {
-                    Text("Usage alerts include the percentage remaining, reset countdown, and comparison with an even pace.")
+                    Text("Server alerts fire once when a process tree crosses the configured memory limit and reset after it falls below 90% of that limit.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -110,7 +127,7 @@ struct SettingsView: View {
             }
 
             Section("Privacy") {
-                Text("Battery and process observations stay on this Mac. When connected, WattHound sends only your OAuth credential and account ID to OpenAI to fetch Codex usage limits.")
+                Text("Battery, process, and server observations stay on this Mac. Automatic dependency setup uses local Homebrew when available, otherwise it stores the official ngrok binary under Application Support. ngrok handles public tunnel traffic. When ChatGPT is connected, Hunter contacts OpenAI only for usage limits.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -120,6 +137,12 @@ struct SettingsView: View {
         .padding(8)
         .frame(width: 500, height: 600)
         .onAppear { chatGPTUsage.start() }
+    }
+
+    private var memoryThresholdLabel: String {
+        serverMemoryThresholdGB < 1
+            ? "\(Int((serverMemoryThresholdGB * 1_024).rounded())) MB"
+            : String(format: "%.2g GB", serverMemoryThresholdGB)
     }
 
     private func requestNotificationAccess(when enabled: Bool, onFailure: @escaping () -> Void) {

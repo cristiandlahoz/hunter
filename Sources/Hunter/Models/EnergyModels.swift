@@ -91,6 +91,7 @@ struct BatterySession: Sendable, Equatable {
 enum SidebarDestination: String, CaseIterable, Identifiable {
     case session = "Session"
     case applications = "Applications"
+    case servers = "Servers"
     case history = "History"
     case battery = "Battery"
 
@@ -100,6 +101,7 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
         switch self {
         case .session: "bolt.horizontal.fill"
         case .applications: "list.bullet.rectangle"
+        case .servers: "network"
         case .history: "chart.xyaxis.line"
         case .battery: "battery.75percent"
         }
@@ -109,8 +111,9 @@ enum SidebarDestination: String, CaseIterable, Identifiable {
         switch self {
         case .session: "1"
         case .applications: "2"
-        case .history: "3"
-        case .battery: "4"
+        case .servers: "3"
+        case .history: "4"
+        case .battery: "5"
         }
     }
 }

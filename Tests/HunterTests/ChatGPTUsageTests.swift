@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import WattHound
+@testable import Hunter
 
 final class ChatGPTUsageTests: XCTestCase {
     func testParsesSessionAndWeeklyWindowsByDuration() throws {

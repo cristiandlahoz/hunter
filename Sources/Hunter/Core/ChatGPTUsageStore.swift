@@ -239,7 +239,7 @@ final class ChatGPTUsageStore: ObservableObject {
         var request = URLRequest(url: ChatGPTEndpoints.usage, timeoutInterval: 12)
         request.setValue("Bearer \(credential.accessToken)", forHTTPHeaderField: "Authorization")
         request.setValue(credential.accountID, forHTTPHeaderField: "ChatGPT-Account-Id")
-        request.setValue("WattHound/0.1", forHTTPHeaderField: "User-Agent")
+        request.setValue("Hunter/0.1", forHTTPHeaderField: "User-Agent")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
         let (data, response) = try await session.data(for: request)
@@ -327,10 +327,18 @@ struct ChatGPTCredential: Codable, Sendable {
 }
 
 struct ChatGPTCredentialStore: Sendable {
-    private let service = "com.cristiandlahoz.watthound.chatgpt"
+    private let service = "com.cristiandlahoz.hunter.chatgpt"
+    private let legacyService = "com.cristiandlahoz.watthound.chatgpt"
     private let account = "oauth"
 
     func load() -> ChatGPTCredential? {
+        if let credential = load(service: service) { return credential }
+        guard let legacy = load(service: legacyService) else { return nil }
+        try? save(legacy)
+        return legacy
+    }
+
+    private func load(service: String) -> ChatGPTCredential? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,

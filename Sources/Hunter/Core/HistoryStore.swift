@@ -8,7 +8,7 @@ actor HistoryStore {
 
     init() {
         let root = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("WattHound", isDirectory: true)
+            .appendingPathComponent("Hunter", isDirectory: true)
         fileURL = root.appendingPathComponent("power-samples.json")
         activityURL = root.appendingPathComponent("application-activity.json")
         encoder.dateEncodingStrategy = .iso8601

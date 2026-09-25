@@ -7,10 +7,7 @@ struct SidebarView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 10) {
-                Image(systemName: "bolt.horizontal.circle.fill")
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(WattColors.energy)
-                Text("WattHound")
+                Text("Hunter")
                     .font(.system(size: 17, weight: .bold))
                     .foregroundStyle(.white)
                 Spacer()

@@ -38,6 +38,35 @@ struct StatusDot: View {
     }
 }
 
+struct KillPulseIndicator: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var isPulsing = false
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(WattColors.critical.opacity(0.7), lineWidth: 1.5)
+                .frame(width: 20, height: 20)
+                .scaleEffect(isPulsing ? 1.65 : 0.65)
+                .opacity(isPulsing ? 0 : 0.9)
+            Circle()
+                .fill(WattColors.critical.opacity(0.14))
+                .frame(width: 25, height: 25)
+                .scaleEffect(isPulsing ? 1.1 : 0.75)
+            Image(systemName: "stop.fill")
+                .font(.system(size: 9, weight: .bold))
+                .foregroundStyle(WattColors.critical)
+        }
+        .frame(width: 34, height: 34)
+        .animation(
+            reduceMotion ? nil : .easeOut(duration: 0.8).repeatForever(autoreverses: false),
+            value: isPulsing
+        )
+        .onAppear { isPulsing = !reduceMotion }
+        .accessibilityLabel("Stopping server")
+    }
+}
+
 extension View {
     func tabularMeasurement() -> some View {
         fontDesign(.rounded).monospacedDigit()

@@ -1,5 +1,5 @@
 import XCTest
-@testable import WattHound
+@testable import Hunter
 
 final class AttributionCalculatorTests: XCTestCase {
     func testAllocatesObservedAndUnassignedShare() {

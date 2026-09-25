@@ -1,4 +1,4 @@
-# WattHound Design System
+# Hunter Design System
 
 ## Direction contract
 
@@ -14,7 +14,7 @@
 
 ## Visual language
 
-WattHound uses a restrained palette. The sidebar is a continuous deep navy field. The workspace is a cool, nearly white paper surface with white table rows. Violet marks selection and active controls; chartreuse marks live battery energy; amber and red are reserved for actionable warning states.
+Hunter uses a restrained palette. The sidebar is a continuous deep navy field. The workspace is a cool, nearly white paper surface with white table rows. Violet marks selection and active controls; chartreuse marks live battery energy; amber and red are reserved for actionable warning states.
 
 Do not use decorative gradients, glass, neon glow, circular progress gauges, or collections of interchangeable metric cards. Hierarchy comes from region, typography, rules, and aligned data.
 

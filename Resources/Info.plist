@@ -5,17 +5,19 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>en</string>
     <key>CFBundleDisplayName</key>
-    <string>WattHound</string>
+    <string>Hunter</string>
     <key>CFBundleExecutable</key>
-    <string>WattHound</string>
+    <string>Hunter</string>
     <key>CFBundleIconFile</key>
-    <string>WattHound</string>
+    <string>Hunter</string>
+    <key>CFBundleIconName</key>
+    <string>Hunter</string>
     <key>CFBundleIdentifier</key>
-    <string>com.cristiandlahoz.watthound</string>
+    <string>com.cristiandlahoz.hunter</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>WattHound</string>
+    <string>Hunter</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>

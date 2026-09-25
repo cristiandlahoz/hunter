@@ -17,7 +17,7 @@ struct ApplicationsView: View {
                     .buttonStyle(.bordered)
                 }
                 Sheet { ApplicationLedger(applications: store.applications) }
-                Text("Energy Impact is Apple’s relative activity score, not a measurement of per-app watts. WattHound samples it over time for session attribution.")
+                Text("Energy Impact is Apple’s relative activity score, not a measurement of per-app watts. Hunter samples it over time for session attribution.")
                     .font(.system(size: 11))
                     .foregroundStyle(WattColors.secondary)
                     .padding(.horizontal, 4)
@@ -254,7 +254,7 @@ struct HistoryView: View {
     @ViewBuilder
     private var powerChart: some View {
         if measuredPowerSamples.count < 2 {
-            emptyChart("Live watts appear while WattHound is running", symbol: "bolt")
+            emptyChart("Live watts appear while Hunter is running", symbol: "bolt")
         } else {
             Chart {
                 ForEach(measuredPowerSamples) { sample in
@@ -311,7 +311,7 @@ struct HistoryView: View {
                 .foregroundStyle(WattColors.violet)
             Text("Collecting the first application sample")
                 .font(.system(size: 13, weight: .medium))
-            Text("Leave WattHound running to build precise session attribution.")
+            Text("Leave Hunter running to build precise session attribution.")
                 .font(.system(size: 11))
                 .foregroundStyle(WattColors.secondary)
         }

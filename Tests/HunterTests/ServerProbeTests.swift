@@ -34,4 +34,15 @@ final class ServerProbeTests: XCTestCase {
         XCTAssertEqual(ServerProbe.port(from: "8083"), 8083)
         XCTAssertNil(ServerProbe.port(from: "localhost"))
     }
+
+    func testExcludesBrowserAgentAndDebuggerButKeepsVaadinHTTPListener() {
+        let java = "/bin/java -Xrunjdwp:transport=dt_socket,server=y,address=5630 -cp target/classes com.example.Application"
+        XCTAssertFalse(ServerProbe.isLikelyDevelopmentServer(processName: "java", command: java, port: 5630))
+        XCTAssertTrue(ServerProbe.isLikelyDevelopmentServer(processName: "java", command: java, port: 8444))
+        XCTAssertFalse(ServerProbe.isLikelyDevelopmentServer(
+            processName: "agent-bro",
+            command: "/opt/homebrew/lib/node_modules/agent-browser/bin/agent-browser-darwin-arm64",
+            port: 61285
+        ))
+    }
 }

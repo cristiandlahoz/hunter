@@ -105,6 +105,8 @@ struct MenuBarView: View {
             .frame(height: 42)
         }
         .frame(width: 400, height: desiredContentHeight, alignment: .top)
+        .background(.regularMaterial)
+        .environment(\.colorScheme, .dark)
         .background(MenuBarWindowSizer(contentHeight: desiredContentHeight))
     }
 
@@ -290,7 +292,7 @@ private struct MenuServerRow: View {
                     if server.framework == "Vaadin" {
                         Text("VAADIN")
                             .font(.system(size: 8, weight: .bold))
-                            .foregroundStyle(WattColors.violet)
+                            .foregroundStyle(Color(red: 0.80, green: 0.66, blue: 1))
                     }
                 }
                 Text(server.gitBranch == nil ? (server.framework ?? server.processName) : server.projectName)
@@ -352,7 +354,7 @@ private struct MenuServerRow: View {
     private var isOverMemoryLimit: Bool { server.memoryBytes >= store.memoryThresholdBytes }
 
     private var portColor: Color {
-        server.tunnel == nil ? Color(red: 0.36, green: 0.63, blue: 0.84) : WattColors.violet
+        server.tunnel == nil ? Color(red: 0.57, green: 0.82, blue: 1) : Color(red: 0.80, green: 0.66, blue: 1)
     }
 }
 

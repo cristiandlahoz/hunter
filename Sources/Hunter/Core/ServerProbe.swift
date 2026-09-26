@@ -23,7 +23,7 @@ actor ServerProbe {
         return Self.parseListeningSockets(sockets.output).compactMap { socket in
             guard let process = processes[socket.pid],
                   process.uid == currentUID,
-                  Self.isLikelyDevelopmentServer(processName: socket.processName, command: process.command) else { return nil }
+                  Self.isLikelyDevelopmentServer(processName: socket.processName, command: process.command, port: socket.port) else { return nil }
             let cwd = Self.currentDirectory(pid: socket.pid)
             guard cwd != "/" else { return nil }
             let project = Self.resolveProject(cwd: cwd, command: process.command)
@@ -90,7 +90,13 @@ actor ServerProbe {
         return Int(address[address.index(after: colon)...])
     }
 
-    private nonisolated static func isLikelyDevelopmentServer(processName: String, command: String) -> Bool {
+    nonisolated static func isLikelyDevelopmentServer(processName: String, command: String, port: Int) -> Bool {
+        let executable = command.split(separator: " ").first.map(String.init) ?? ""
+        guard !URL(fileURLWithPath: executable).lastPathComponent.hasPrefix("agent-browser") else { return false }
+        if command.contains("jdwp"), command.split(whereSeparator: { $0 == "," || $0.isWhitespace })
+            .contains(where: { $0 == "address=\(port)" || ($0.hasPrefix("address=") && $0.hasSuffix(":\(port)")) }) {
+            return false
+        }
         let value = (processName + " " + command).lowercased()
         guard !value.contains(".app/contents/") else { return false }
         let markers = [
